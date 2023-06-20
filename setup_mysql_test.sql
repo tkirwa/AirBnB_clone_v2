@@ -1,4 +1,5 @@
 -- Create script that prepares a MySQL server for the project
+
 CREATE DATABASE IF NOT EXISTS hbnb_test_db;
 CREATE USER IF NOT EXISTS hbnb_test@localhost;
 SET PASSWORD FOR hbnb_test@localhost = 'hbnb_test_pwd';
