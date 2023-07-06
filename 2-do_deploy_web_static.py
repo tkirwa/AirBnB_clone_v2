@@ -34,8 +34,8 @@ def do_deploy(archive_path):
             api.run("rm -f {}".format(putpath[0]))
             api.run("mv -u {}/web_static/* {}".format(outpath, outpath))
             api.run("rm -rf {}/web_static".format(outpath))
-            api.run("rm -rf /data/web_static/current")
-            api.run("ln -sf {} /data/web_static/current".format(outpath))
+            api.run("rm -rf ~/data/web_static/current")
+            api.run("ln -sf {} ~/data/web_static/current".format(outpath))
             print("New version deployed!")
         except Exception as e:
             print("An error occurred:", str(e))
