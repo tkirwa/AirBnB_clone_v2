@@ -24,7 +24,7 @@ def do_deploy(archive_path):
     with api.cd("/tmp"):
         basename = os.path.basename(archive_path)
         root, ext = os.path.splitext(basename)
-        outpath = "/data/web_static/releases/{}".format(root)
+        outpath = "~/data/web_static/releases/{}".format(root)
         try:
             putpath = api.put(archive_path)
             if files.exists(outpath):
