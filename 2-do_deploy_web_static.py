@@ -3,10 +3,10 @@
 
 import os
 
-from fabric import api, env
+from fabric import api
 from fabric.contrib import files
 
-env.hosts = ["34.204.95.241", "52.87.230.196"]
+api.env.hosts = ["34.204.95.241", "52.87.230.196"]
 api.env.user = "ubuntu"
 api.env.key_filename = "~/.ssh/school"
 
