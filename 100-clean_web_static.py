@@ -2,7 +2,7 @@
 """ Function that deploys """
 from fabric.api import *
 
-env.hosts = ["35.231.33.237", "34.74.155.163"]
+env.hosts = ["34.204.95.241", "52.87.230.196"]
 env.user = "ubuntu"
 
 
