@@ -20,41 +20,41 @@ exec {'start Nginx':
 
 exec {'create first directory':
   provider => shell,
-  command  => 'sudo mkdir -p ~/data/web_static/releases/test/',
+  command  => 'sudo mkdir -p /home/ubuntu/web_static/releases/test/',
   before   => Exec['create second directory'],
 }
 
 exec {'create second directory':
   provider => shell,
-  command  => 'sudo mkdir -p ~/data/web_static/shared/',
+  command  => 'sudo mkdir -p /home/ubuntu/web_static/shared/',
   before   => Exec['content into html'],
 }
 
 exec {'content into html':
   provider => shell,
-  command  => 'echo "Holberton School" | sudo tee ~/data/web_static/releases/test/index.html',
+  command  => 'echo "Holberton School" | sudo tee /home/ubuntu/web_static/releases/test/index.html',
   before   => Exec['symbolic link'],
 }
 
 exec {'symbolic link':
   provider => shell,
-  command  => 'sudo ln -sf ~/data/web_static/releases/test/ ~/data/web_static/current',
+  command  => 'sudo ln -sf /home/ubuntu/web_static/releases/test/ /home/ubuntu/web_static/current',
   before   => Exec['put location'],
 }
 
 exec {'put location':
   provider => shell,
-  command  => 'sudo sed -i \'38i\\tlocation /hbnb_static/ {\n\t\talias ~/data/web_static/current/;\n\t\tautoindex off;\n\t}\n\' /etc/nginx/sites-available/default',
+  command  => 'sudo sed -i \'38i\\tlocation /hbnb_static/ {\n\t\talias /home/ubuntu/data/web_static/current/;\n\t\tautoindex off;\n\t}\n\' /etc/nginx/sites-available/default',
   before   => Exec['restart Nginx'],
 }
 
 exec {'restart Nginx':
   provider => shell,
   command  => 'sudo service nginx restart',
-  before   => File['~/data/']
+  before   => File['/home/ubuntu/data/']
 }
 
-file {'~/data/':
+file {'/home/ubuntu/data/':
   ensure  => directory,
   owner   => 'ubuntu',
   group   => 'ubuntu',
