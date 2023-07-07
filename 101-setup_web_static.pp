@@ -1,62 +1,87 @@
-# Script that configures Nginx server with some folders and files
+# Puppet for setup
 
-exec {'update':
-  provider => shell,
-  command  => 'sudo apt-get -y update',
-  before   => Exec['install Nginx'],
+$nginx_conf = "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    add_header X-Served-By ${hostname};
+    root   /var/www/html;
+    index  index.html index.htm;
+    location /hbnb_static {
+        alias /home/ubuntu/data/web_static/current;
+        index index.html index.htm;
+    }
+    location /redirect_me {
+        return 301 http://linktr.ee/firdaus_h_salim/;
+    }
+    error_page 404 /404.html;
+    location /404 {
+      root /var/www/html;
+      internal;
+    }
+}"
+
+package { 'nginx':
+  ensure   => 'present',
+  provider => 'apt'
 }
 
-exec {'install Nginx':
-  provider => shell,
-  command  => 'sudo apt-get -y install nginx',
-  before   => Exec['start Nginx'],
+-> file { '/home/ubuntu/data':
+  ensure  => 'directory'
 }
 
-exec {'start Nginx':
-  provider => shell,
-  command  => 'sudo service nginx start',
-  before   => Exec['create first directory'],
+-> file { '/home/ubuntu/data/web_static':
+  ensure => 'directory'
 }
 
-exec {'create first directory':
-  provider => shell,
-  command  => 'sudo mkdir -p /home/ubuntu/web_static/releases/test/',
-  before   => Exec['create second directory'],
+-> file { '/home/ubuntu/data/web_static/releases':
+  ensure => 'directory'
 }
 
-exec {'create second directory':
-  provider => shell,
-  command  => 'sudo mkdir -p /home/ubuntu/web_static/shared/',
-  before   => Exec['content into html'],
+-> file { '/home/ubuntu/data/web_static/releases/test':
+  ensure => 'directory'
 }
 
-exec {'content into html':
-  provider => shell,
-  command  => 'echo "Holberton School" | sudo tee /home/ubuntu/web_static/releases/test/index.html',
-  before   => Exec['symbolic link'],
+-> file { '/home/ubuntu/data/web_static/shared':
+  ensure => 'directory'
 }
 
-exec {'symbolic link':
-  provider => shell,
-  command  => 'sudo ln -sf /home/ubuntu/web_static/releases/test/ /home/ubuntu/web_static/current',
-  before   => Exec['put location'],
+-> file { '/home/ubuntu/data/web_static/releases/test/index.html':
+  ensure  => 'present',
+  content => "this webpage is found in data/web_static/releases/test/index.htm \n"
 }
 
-exec {'put location':
-  provider => shell,
-  command  => 'sudo sed -i \'38i\\tlocation /hbnb_static/ {\n\t\talias /home/ubuntu/data/web_static/current/;\n\t\tautoindex off;\n\t}\n\' /etc/nginx/sites-available/default',
-  before   => Exec['restart Nginx'],
+-> file { '/home/ubuntu/data/web_static/current':
+  ensure => 'link',
+  target => '/home/ubuntu/data/web_static/releases/test'
 }
 
-exec {'restart Nginx':
-  provider => shell,
-  command  => 'sudo service nginx restart',
-  before   => File['/home/ubuntu/data/']
+-> exec { 'chown -R ubuntu:ubuntu /home/ubuntu/data/':
+  path => '/usr/bin/:/usr/local/bin/:/bin/'
 }
 
-file {'/home/ubuntu/data/':
-  ensure  => directory,
-  owner   => 'ubuntu',
-  group   => 'ubuntu',
-  recurse => true,
+file { '/var/www':
+  ensure => 'directory'
+}
+
+-> file { '/var/www/html':
+  ensure => 'directory'
+}
+
+-> file { '/var/www/html/index.html':
+  ensure  => 'present',
+  content => "This is my first upload  in /var/www/index.html***\n"
+}
+
+-> file { '/var/www/html/404.html':
+  ensure  => 'present',
+  content => "Ceci n'est pas une page - Error page\n"
+}
+
+-> file { '/etc/nginx/sites-available/default':
+  ensure  => 'present',
+  content => $nginx_conf
+}
+
+-> exec { 'nginx restart':
+  path => '/etc/init.d/'
 }
