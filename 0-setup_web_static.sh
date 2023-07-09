@@ -1,32 +1,47 @@
 #!/usr/bin/env bash
-# sets up the web servers for the deployment of web_static
 
-sudo apt-get -y update
-# Install Nginx if it is not already installed
-sudo apt-get -y install nginx
-# Create the folder /data/ if it doesn’t already exist
-# Create the folder /data/web_static/ if it doesn’t already exist
-# Create the folder /data/web_static/releases/ if it doesn’t already exist
-# Create the folder /data/web_static/releases/test/ if it doesn’t already exist
-# Create the folder /data/web_static/shared/ if it doesn’t already exist
-sudo mkdir -p /data/web_static/releases/test /data/web_static/shared
+# Install Nginx if it's not already installed
+if ! command -v nginx &> /dev/null; then
+    apt-get -y update
+    apt-get -y install nginx
+fi
 
-# echo "This is a test" | sudo tee /data/web_static/releases/test/index.html
+# Create necessary folders if they don't exist
+web_static_dir="/data/web_static"
+releases_dir="$web_static_dir/releases"
+shared_dir="$web_static_dir/shared"
+test_dir="$releases_dir/test"
+index_file="$test_dir/index.html"
+
+mkdir -p "$web_static_dir"
+mkdir -p "$releases_dir"
+mkdir -p "$shared_dir"
+mkdir -p "$test_dir"
+
+# Create a fake HTML file for testing
 echo "<html>
   <head>
   </head>
   <body>
     Holberton School
   </body>
-</html>" | sudo tee /data/web_static/releases/test/index.html
+</html>" > "$index_file"
 
-sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
-# The command chown -hR is used to change the ownership of files and directories recursively
-sudo chown -hR ubuntu:ubuntu /data/
-# This command inserts the following block of text at line 38 of the
-# /etc/nginx/sites-available/default file
-sudo sed -i '38i\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n' /etc/nginx/sites-available/default
-# Update the Nginx configuration to serve the content of
-# /data/web_static/current/ to hbnb_static
-# Restart Nginx after updating the configuration
-sudo service nginx restart
+# Create or update symbolic link
+symbolic_link="/data/web_static/current"
+if [ -L "$symbolic_link" ]; then
+    rm "$symbolic_link"
+fi
+ln -s "$test_dir" "$symbolic_link"
+
+# Give ownership to ubuntu user and group
+chown -R ubuntu:ubuntu "/data/"
+
+# Update Nginx configuration
+config_file="/etc/nginx/sites-available/default"
+sed -i 's/^\(\s*location \/ {\)$/\1\n\t\talias \/data\/web_static\/current\/;/' "$config_file"
+
+# Restart Nginx
+service nginx restart
+
+exit 0
