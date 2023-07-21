@@ -31,41 +31,48 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """Deploy web files to server
-    """
+    """Deploy web files to server"""
     try:
-        if not (path.exists(archive_path)):
+        if not path.exists(archive_path):
             return False
 
         # Upload archive
+        print("Uploading archive...")
         put(archive_path, '/tmp/')
 
         # Get the filename without the extension
         filename = path.basename(archive_path).split(".")[0]
 
         # Create target dir
+        print("Creating target directory...")
         run('sudo mkdir -p /data/web_static/releases/{}/'.format(filename))
 
         # Uncompress archive and delete .tgz
+        print("Uncompressing archive...")
         run('sudo tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/'
             .format(filename, filename))
 
         # Remove archive
+        print("Removing archive...")
         run('sudo rm /tmp/{}.tgz'.format(filename))
 
         # Move contents into host web_static
+        print("Moving contents to target directory...")
         run('sudo mv -n /data/web_static/releases/{}/web_static/*'
             ' /data/web_static/releases/{}/'
             .format(filename, filename))
 
         # Remove extraneous web_static dir
+        print("Cleaning up extraneous directory...")
         run('sudo rm -rf /data/web_static/releases/{}/web_static'
             .format(filename))
 
         # Delete pre-existing symbolic link
+        print("Removing existing symbolic link...")
         run('sudo rm -rf /data/web_static/current')
 
         # Re-establish symbolic link
+        print("Creating new symbolic link...")
         run('sudo ln -s /data/web_static/releases/{}/ /data/web_static/current'
             .format(filename))
 
