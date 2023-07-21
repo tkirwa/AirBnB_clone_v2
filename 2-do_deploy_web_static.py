@@ -3,10 +3,31 @@
 """
 from fabric.api import *
 from os import path
+from datetime import datetime
 
 env.hosts = ['34.204.95.241', '52.87.230.196']
 env.user = 'ubuntu'
 env.key_filename = '~/.ssh/id_rsa'
+
+
+def do_pack():
+    """Fabric script that generates a .tgz archive from the contents
+    of the web_static folder"""
+    try:
+        local("mkdir -p versions")
+        date = datetime.now().strftime("%Y%m%d%H%M%S")
+        archive_path = "versions/web_static_{}.tgz".format(date)
+        # result = local("tar -cvzf {} -C web_static".format(filename))
+        # result = local("tar -cvzf {} -C web_static/*".format(archive_path))
+        result = local("tar -cvzf {} web_static/".format(archive_path))
+
+        if result.succeeded:
+            return archive_path
+        else:
+            return None
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return None
 
 
 def do_deploy(archive_path):
