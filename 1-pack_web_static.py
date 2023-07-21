@@ -13,12 +13,13 @@ def do_pack():
     try:
         local("mkdir -p versions")
         date = datetime.now().strftime("%Y%m%d%H%M%S")
-        filename = "versions/web_static_{}.tgz".format(date)
+        archive_path = "versions/web_static_{}.tgz".format(date)
         # result = local("tar -cvzf {} -C web_static".format(filename))
-        result = local("tar -cvzf {} -C web_static/*".format(filename))
+        # result = local("tar -cvzf {} -C web_static/*".format(archive_path))
+        result = local("tar -cvzf {} web_static/".format(archive_path))
 
         if result.succeeded:
-            return filename
+            return archive_path
         else:
             return None
     except Exception as e:
