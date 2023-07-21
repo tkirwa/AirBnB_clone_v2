@@ -45,35 +45,35 @@ def do_deploy(archive_path):
 
         # Create target dir
         print("Creating target directory...")
-        run('sudo mkdir -p /data/web_static/releases/{}/'.format(filename))
+        run('mkdir -p /data/web_static/releases/{}/'.format(filename))
 
         # Uncompress archive and delete .tgz
         print("Uncompressing archive...")
-        run('sudo tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/'
+        run('tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/'
             .format(filename, filename))
 
         # Remove archive
         print("Removing archive...")
-        run('sudo rm /tmp/{}.tgz'.format(filename))
+        run('rm /tmp/{}.tgz'.format(filename))
 
         # Move contents into host web_static
         print("Moving contents to target directory...")
-        run('sudo mv -n /data/web_static/releases/{}/web_static/*'
+        run('mv -n /data/web_static/releases/{}/web_static/*'
             ' /data/web_static/releases/{}/'
             .format(filename, filename))
 
         # Remove extraneous web_static dir
         print("Cleaning up extraneous directory...")
-        run('sudo rm -rf /data/web_static/releases/{}/web_static'
+        run('rm -rf /data/web_static/releases/{}/web_static'
             .format(filename))
 
         # Delete pre-existing symbolic link
         print("Removing existing symbolic link...")
-        run('sudo rm -rf /data/web_static/current')
+        run('rm -rf /data/web_static/current')
 
         # Re-establish symbolic link
         print("Creating new symbolic link...")
-        run('sudo ln -s /data/web_static/releases/{}/ /data/web_static/current'
+        run('ln -s /data/web_static/releases/{}/ /data/web_static/current'
             .format(filename))
 
         print("New version deployed!")
