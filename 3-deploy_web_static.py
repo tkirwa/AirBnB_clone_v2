@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """Compress web static package
 """
-from datetime import datetime
+from fabric.api import *
 from os import path
+from datetime import datetime
 from os.path import exists
 
-from fabric.api import *
 
 env.hosts = ['34.204.95.241', '52.87.230.196']
 env.user = 'ubuntu'
@@ -19,8 +19,15 @@ def do_pack():
         local("mkdir -p versions")
         date = datetime.now().strftime("%Y%m%d%H%M%S")
         archive_path = "versions/web_static_{}.tgz".format(date)
-        local("tar -cvzf {} web_static".format(archive_path))
-        return archive_path
+        local("echo \"<html><head></head><body>"
+              "New version deployed!</body></html>\" > "
+              "web_static/my_index.html")
+        result = local("tar -cvzf {} web_static/".format(archive_path))
+
+        if result.succeeded:
+            return archive_path
+        else:
+            return None
     except Exception as e:
         print("An error occurred:", str(e))
         return None
@@ -81,14 +88,9 @@ def do_deploy(archive_path):
 
 
 def deploy():
-    """Create and distribute an archive to web servers"""
+    """Deploy locally"""
     archive_path = do_pack()
     if not archive_path:
         return False
-
-    new_file = "web_static/my_index.html"
-    local("echo \"<html><head></head><body>"
-          "New version deployed!</body></html>\" > {}"
-          .format(new_file))
 
     return do_deploy(archive_path)

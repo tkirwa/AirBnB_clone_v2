@@ -19,8 +19,9 @@ def do_pack():
         local("mkdir -p versions")
         date = datetime.now().strftime("%Y%m%d%H%M%S")
         archive_path = "versions/web_static_{}.tgz".format(date)
-        # result = local("tar -cvzf {} -C web_static".format(filename))
-        # result = local("tar -cvzf {} -C web_static/*".format(archive_path))
+        local("echo \"<html><head></head><body>"
+              "New version deployed!</body></html>\" > "
+              "web_static/my_index.html")
         result = local("tar -cvzf {} web_static/".format(archive_path))
 
         if result.succeeded:
