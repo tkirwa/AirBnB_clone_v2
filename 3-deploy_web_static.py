@@ -11,14 +11,20 @@ env.hosts = ['34.204.95.241', '52.87.230.196']
 
 
 def do_pack():
-    """generates a tgz archive"""
+    """Fabric script that generates a .tgz archive from the contents
+    of the web_static folder"""
     try:
+        local("mkdir -p versions")
         date = datetime.now().strftime("%Y%m%d%H%M%S")
-        if isdir("versions") is False:
-            local("mkdir versions")
-        file_name = "versions/web_static_{}.tgz".format(date)
-        local("tar -cvzf {} web_static".format(file_name))
-        return file_name
+        archive_path = "versions/web_static_{}.tgz".format(date)
+        # result = local("tar -cvzf {} -C web_static".format(filename))
+        # result = local("tar -cvzf {} -C web_static/*".format(archive_path))
+        result = local("tar -cvzf {} web_static/".format(archive_path))
+
+        if result.succeeded:
+            return archive_path
+        else:
+            return None
     except Exception as e:
         print("An error occurred:", str(e))
         return None
@@ -40,6 +46,8 @@ def do_deploy(archive_path):
         run('rm -rf {}{}/web_static'.format(path, no_ext))
         run('rm -rf /data/web_static/current')
         run('ln -s {}{}/ /data/web_static/current'.format(path, no_ext))
+        print("New version deployed!")
+        # Return True on success
         return True
     except Exception as e:
         print("An error occurred:", str(e))

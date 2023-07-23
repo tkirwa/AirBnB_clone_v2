@@ -24,7 +24,7 @@ sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 # The command chown -hR is used to change the ownership of files and directories recursively
 # sudo chown -hR ubuntu:ubuntu /data/
 
-sudo chown -R ubuntu:ubuntu /data/
+sudo chown -hR ubuntu:ubuntu /data/
 # This command inserts the following block of text at line 38 of the
 # /etc/nginx/sites-available/default file
 sudo sed -i '38i\\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;\n\t}\n' /etc/nginx/sites-available/default
