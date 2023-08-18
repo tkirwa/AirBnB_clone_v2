@@ -16,12 +16,12 @@ def hello():
     return 'Hello HBNB!'
 
 
-# @app.route("/airbnb-onepage/", strict_slashes=False)
-# def hello_hbnb():
-#     """
-#     Display "Hello HBNB!" when accessing the /airbnb-onepage/ route.
-#     """
-#     return "Hello HBNB!"
+@app.route("/airbnb-onepage/", strict_slashes=False)
+def hello_hbnb():
+    """
+    Display "Hello HBNB!" when accessing the /airbnb-onepage/ route.
+    """
+    return "Hello HBNB!"
 
 
 if __name__ == "__main__":
